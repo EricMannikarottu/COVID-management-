@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19 Management</title>
+    <link rel="stylesheet" href="NICE.css">
+</head>
+<body>
+    <div id="video-container"></div>
+    <video id="video-background" autoplay muted loop>
+        <source src="The VIBE of SURGERY… _ Cinematic B Roll _ Canon C70 - Downloaded from clipzag.com.mp4" type="video/mp4">
+    </video>
+</div>
+    <header>
+        <h1>COVID-19 Management</h1>
+    </header>
+
+    <section>
+        <div class="card">
+            <h2>Global Information</h2>
+            <div class="info">
+                <p>Total Cases: <span id="totalCases">Loading...</span></p>
+                <p>Total Deaths: <span id="totalDeaths">Loading...</span></p>
+                <p>No of Beds Available in Hospitals: <span id="totalRecovered">Loading...</span></p>
+                <p>Total Ambulances: <span id="totalAmbulances">Loading...</span></p>
+            </div>
+            <button class="button" onclick="refreshGlobalData()">Refresh Global</button>
+        </div>
+
+        <div class="card">
+            <h2>Your Country Information</h2>
+            <label for="countrySelect">Select Country: </label>
+            <select id="countrySelect" onchange="getCountryData(this.value)">
+            </select>
+            <div class="info">
+                <p>Total Cases: <span id="countryCases">Loading...</span></p>
+                <p>Total Deaths: <span id="countryDeaths">Loading...</span></p>
+                <p>No of Beds Available in Hospitals: <span id="countryRecovered">Loading...</span></p>
+                <p>Total Ambulances: <span id="countryAmbulances">Loading...</span></p>
+            </div>
+            <!-- <button class="button" onclick="refreshCountryData()">Refresh Country</button> -->
+        </div> 
+    </section>
+    <div id="additional-data-container">
+        <h3>Contact Us :-</h3>
+        <p class="RA">Aditya Mukherjee-RA2311056010202</p>
+        <p class="RA">C.Laxamana Srikar-Ra2311056010245</p>
+    </div>
+    <script>
+        function refreshGlobalData() {
+            fetch('http://localhost:8000/api.php?endpoint=global')
+                .then(response => response.json())
+                .then(data => {
+                    updateGlobalData(data);
+                })
+                .catch(error => console.error('Error fetching global data:', error));
+        }
+
+        function getCountryData(country) {
+            fetch(`http://localhost:8000/api.php?endpoint=country&countryName=${country}`)
+                .then(response => response.json())
+                .then(data => {
+                    updateCountryData(data);
+                })
+                .catch(error => console.error(`Error fetching ${country}'s data:`, error));
+        }
+
+        function updateGlobalData(data) {
+            document.getElementById('totalCases').innerText = data.totalCases;
+            document.getElementById('totalDeaths').innerText = data.totalDeaths;
+            document.getElementById('totalRecovered').innerText = data.totalRecovered;
+            document.getElementById('totalAmbulances').innerText = data.totalAmbulances;
+        }
+
+        function updateCountryData(data) {
+            document.getElementById('countryCases').innerText = data.totalCases;
+            document.getElementById('countryDeaths').innerText = data.totalDeaths;
+            document.getElementById('countryRecovered').innerText = data.totalRecovered;
+            document.getElementById('countryAmbulances').innerText = data.totalAmbulances;
+            
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('http://localhost:8000/api.php?endpoint=countries')
+                .then(response => response.json())
+                .then(data => {
+                    const countrySelect = document.getElementById('countrySelect');
+                    data.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country;
+                        option.text = country;
+                        countrySelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching country data:', error));
+
+            refreshGlobalData();
+        });
+    </script>
+</body>
+</html>
